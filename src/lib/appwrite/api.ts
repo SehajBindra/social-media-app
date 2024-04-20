@@ -1,4 +1,4 @@
-import { ID, Query } from "appwrite";
+import { ID, Models, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
 import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
@@ -264,6 +264,29 @@ export async function getPostById(postId?: string) {
     console.log(error);
   }
 }
+export async function getCommentById(postId: string) {
+  if (!postId) {
+    throw new Error("postId and userId are required");
+  }
+
+  console.log("postId", postId);
+  try {
+    const comments = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.commentsCollectionId,
+      // [`post=${postId}`]
+      [Query.equal("postId", postId)]
+    );
+
+    if (!comments) throw Error;
+    console.log("<<<comments", comments);
+    return comments;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+getCommentById("65813396723d32be4b89");
 
 // ============================== UPDATE POST
 export async function updatePost(post: IUpdatePost) {
@@ -370,6 +393,33 @@ export async function likePost(postId: string, likesArray: string[]) {
   }
 }
 
+// ==============================  POST Comments
+export async function addComment(userId: string, postId: string, text: string) {
+  console.log("userId", userId);
+  console.log("postId", postId);
+
+  try {
+    const updatedPost = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.commentsCollectionId,
+      ID.unique(),
+      {
+        user: "user_id",
+        post: postId,
+        userId: userId,
+        postId: postId,
+        text: text,
+        // created: new Date().toISOString(),
+      }
+    );
+
+    if (!updatedPost) throw Error;
+    console.log("updatedPost", updatedPost);
+    return updatedPost;
+  } catch (error) {
+    console.log(error);
+  }
+}
 // ============================== SAVE POST
 export async function savePost(userId: string, postId: string) {
   try {

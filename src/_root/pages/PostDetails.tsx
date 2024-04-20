@@ -8,15 +8,25 @@ import {
   useGetPostById,
   useGetUserPosts,
   useDeletePost,
+  useCommentPost,
+  useGetCommentByID,
 } from "@/lib/react-query/queries";
 import { multiFormatDateString } from "@/lib/utils";
 import { useUserContext } from "@/context/AuthContext";
-
+import { addComment } from "@/lib/appwrite/api";
+import { useState } from "react";
+import { Models } from "appwrite";
+interface Props {
+  comments: Models.DocumentList<Models.Document> | undefined;
+}
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useUserContext();
-
+  const { mutate: addComment } = useCommentPost();
+  const [comment, setComment] = useState("");
+  const { data: comments } = useGetCommentByID(id!);
+  console.log("comments", comments);
   const { data: post, isLoading } = useGetPostById(id);
   const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
     post?.creator.$id
@@ -30,6 +40,17 @@ const PostDetails = () => {
   const handleDeletePost = () => {
     deletePost({ postId: id, imageId: post?.imageId });
     navigate(-1);
+  };
+
+  const sendComment = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
+    addComment({ userId: user.id, postId: post?.$id!, text: comment });
+    setComment("");
+
+    console.log("userId", user.id);
+    console.log("postId", post?.$id);
+    console.log("comment", comment);
   };
 
   return (
@@ -120,6 +141,53 @@ const PostDetails = () => {
 
             <div className="flex flex-col flex-1 w-full small-medium lg:base-regular">
               <p>{post?.caption}</p>
+
+              <ul className="mt-10">
+                <div>
+                  <h2 className="text-xl">Comments</h2>
+                  {comments?.documents.map((comment) => (
+                    <div className="pt-4 flex items-center text-white/60">
+                      <div className="flex items-center space-x-2">
+                        <img
+                          src={user.imageUrl}
+                          alt="creator"
+                          className="w-6 h-6 object-cover rounded-full"
+                        />
+                        <h2 className="font-semibold text-white">
+                          {" "}
+                          {user.name}{" "}
+                        </h2>
+                      </div>
+
+                      <li
+                        className=" flex items-center space-x-2 ml-2"
+                        key={comment.$id}>
+                        <p>{comment.text}</p>
+
+                        {/* <p>{comment.$createdAt}</p> */}
+                      </li>
+                    </div>
+                  ))}
+                </div>
+              </ul>
+
+              <form className="  ">
+                <textarea
+                  rows={2}
+                  cols={2}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Write your comments "
+                  className=" mt-4 h-auto overflow-y-auto scrollbar-none w-full bg-transparent  resize-none  mr-2 flex-1 focus:ring-0 outline-none"
+                />
+                <button
+                  type="submit"
+                  disabled={!comment}
+                  onClick={(e) => sendComment(e)}
+                  className=" font-[600] mt-3 text-[16px] text-blue-400">
+                  Post
+                </button>
+              </form>
               <ul className="flex gap-1 mt-2">
                 {post?.tags.map((tag: string, index: string) => (
                   <li

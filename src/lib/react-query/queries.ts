@@ -24,9 +24,17 @@ import {
   getInfinitePosts,
   searchPosts,
   savePost,
+  addComment,
   deleteSavedPost,
+  getCommentById,
 } from "@/lib/appwrite/api";
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import {
+  INewComment,
+  INewPost,
+  INewUser,
+  IUpdatePost,
+  IUpdateUser,
+} from "@/types";
 
 // ============================================================
 // AUTH QUERIES
@@ -106,6 +114,13 @@ export const useGetPostById = (postId?: string) => {
     enabled: !!postId,
   });
 };
+export const useGetCommentByID = (postId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_COMMENT_BY_ID, postId],
+    queryFn: () => getCommentById(postId),
+    enabled: !!postId,
+  });
+};
 
 export const useGetUserPosts = (userId?: string) => {
   return useQuery({
@@ -179,6 +194,18 @@ export const useSavePost = () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_POSTS],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+      });
+    },
+  });
+};
+export const useCommentPost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, postId, text }: INewComment) =>
+      addComment(userId, postId, text),
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
       });

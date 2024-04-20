@@ -8,6 +8,8 @@ import {
   useSavePost,
   useDeleteSavedPost,
   useGetCurrentUser,
+  useCommentPost,
+  useGetCommentByID,
 } from "@/lib/react-query/queries";
 
 type PostStatsProps = {
@@ -21,9 +23,13 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
   const [likes, setLikes] = useState<string[]>(likesList);
   const [isSaved, setIsSaved] = useState(false);
+  // const [comment, setComment] = useState("");
+  const { data: comments } = useGetCommentByID(post.$id);
+  console.log("comments", comments);
 
   const { mutate: likePost } = useLikePost();
   const { mutate: savePost } = useSavePost();
+  // const { mutate: addComment } = useCommentPost();
   const { mutate: deleteSavePost } = useDeleteSavedPost();
 
   const { data: currentUser } = useGetCurrentUser();
@@ -89,6 +95,12 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
         />
         <p className="small-medium lg:base-medium">{likes.length}</p>
       </div>
+      {/* 
+      <ul>
+        {comments?.documents.map((comment: any) => (
+          <li key={comment.$id}>{comment.text}</li>
+        ))}
+      </ul> */}
 
       <div className="flex gap-2">
         <img
