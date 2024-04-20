@@ -13,12 +13,12 @@ import {
 } from "@/lib/react-query/queries";
 import { multiFormatDateString } from "@/lib/utils";
 import { useUserContext } from "@/context/AuthContext";
-import { addComment } from "@/lib/appwrite/api";
+// import { addComment } from "@/lib/appwrite/api";
 import { useState } from "react";
-import { Models } from "appwrite";
-interface Props {
-  comments: Models.DocumentList<Models.Document> | undefined;
-}
+// import { Models } from "appwrite";
+// interface Props {
+//   comments: Models.DocumentList<Models.Document> | undefined;
+// }
 const PostDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -26,7 +26,7 @@ const PostDetails = () => {
   const { mutate: addComment } = useCommentPost();
   const [comment, setComment] = useState("");
   const { data: comments } = useGetCommentByID(id!);
-  console.log("comments", comments);
+  // console.log("comments", comments);
   const { data: post, isLoading } = useGetPostById(id);
   const { data: userPosts, isLoading: isUserPostLoading } = useGetUserPosts(
     post?.creator.$id
@@ -48,9 +48,9 @@ const PostDetails = () => {
     addComment({ userId: user.id, postId: post?.$id!, text: comment });
     setComment("");
 
-    console.log("userId", user.id);
-    console.log("postId", post?.$id);
-    console.log("comment", comment);
+    // console.log("userId", user.id);
+    // console.log("postId", post?.$id);
+    // console.log("comment", comment);
   };
 
   return (

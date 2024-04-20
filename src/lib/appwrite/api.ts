@@ -1,4 +1,4 @@
-import { ID, Models, Query } from "appwrite";
+import { ID, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
 import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
@@ -269,7 +269,7 @@ export async function getCommentById(postId: string) {
     throw new Error("postId and userId are required");
   }
 
-  console.log("postId", postId);
+  // console.log("postId", postId);
   try {
     const comments = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -279,7 +279,7 @@ export async function getCommentById(postId: string) {
     );
 
     if (!comments) throw Error;
-    console.log("<<<comments", comments);
+    // console.log("<<<comments", comments);
     return comments;
   } catch (error) {
     console.log(error);
@@ -420,6 +420,29 @@ export async function addComment(userId: string, postId: string, text: string) {
     console.log(error);
   }
 }
+
+// follow and unfollow logic
+export async function addFollower(followerId: string, followingId: string) {
+  try {
+    // Example usage: const followerId = getCurrentUserId(); // Get current authenticated user's ID
+    // Example usage: const followingId = getUserProfileId(); // Get ID of the user being followed
+
+    const response = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.commentsCollectionId,
+      ID.unique(),
+      {
+        follower: followerId,
+        following: followingId,
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error adding follower:", error);
+    throw error;
+  }
+}
+
 // ============================== SAVE POST
 export async function savePost(userId: string, postId: string) {
   try {

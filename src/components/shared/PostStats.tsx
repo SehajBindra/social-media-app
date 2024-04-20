@@ -8,8 +8,8 @@ import {
   useSavePost,
   useDeleteSavedPost,
   useGetCurrentUser,
-  useCommentPost,
-  useGetCommentByID,
+  // useCommentPost,
+  // useGetCommentByID,
 } from "@/lib/react-query/queries";
 
 type PostStatsProps = {
@@ -24,8 +24,8 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
   const [likes, setLikes] = useState<string[]>(likesList);
   const [isSaved, setIsSaved] = useState(false);
   // const [comment, setComment] = useState("");
-  const { data: comments } = useGetCommentByID(post.$id);
-  console.log("comments", comments);
+  // const { data: comments } = useGetCommentByID(post.$id);
+  // console.log("comments", comments);
 
   const { mutate: likePost } = useLikePost();
   const { mutate: savePost } = useSavePost();
